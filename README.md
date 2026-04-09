@@ -105,9 +105,3 @@ WallCalendar (root)
 - Notes are tied to exact date ranges; future: attach notes to individual days
 - Could add a "flip" page-turn animation using CSS 3D transforms
 - Color theme extraction from hero image (using Canvas `getImageData`) would be a cool enhancement
-
----
-
-## License
-
-MIT — built for assessment purposes.
