@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 
 const MONTHS = [
   "January",
@@ -22,15 +23,15 @@ const MONTH_IMAGES = [
   "https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=900&q=75",
   "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=900&q=75",
   "https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=900&q=75",
-  "https://images.unsplash.com/photo-1490750967868-88df5691166a?w=900&q=75",
+  "https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=900&q=75",
   "https://images.unsplash.com/photo-1520962922320-2038eebab146?w=900&q=75",
   "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&q=75",
   "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=900&q=75",
   "https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=900&q=75",
   "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&q=75",
-  "https://images.unsplash.com/photo-1473496169904-658ba7574b0d?w=900&q=75",
+  "https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=900&q=75",
   "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=900&q=75",
-  "https://images.unsplash.com/photo-1482003297000-b7663a1673f9?w=900&q=75",
+  "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=900&q=75",
 ];
 
 const HOLIDAYS = {
@@ -46,27 +47,33 @@ const HOLIDAYS = {
   "11-25": "Christmas",
 };
 
-function getDaysInMonth(y, m) {
+function getDaysInMonth(y: number, m: number): number {
   return new Date(y, m + 1, 0).getDate();
 }
-function getFirstDay(y, m) {
+function getFirstDay(y: number, m: number): number {
   const d = new Date(y, m, 1).getDay();
   return d === 0 ? 6 : d - 1;
 }
-function dateVal(d) {
+function dateVal(d: { y: number; m: number; d: number } | null): number {
   return d ? d.y * 10000 + d.m * 100 + d.d : 0;
 }
-function sameDay(a, b) {
+function sameDay(a: { y: number; m: number; d: number } | null, b: { y: number; m: number; d: number } | null): boolean {
   return a && b && a.y === b.y && a.m === b.m && a.d === b.d;
+}
+
+interface DateObj {
+  y: number;
+  m: number;
+  d: number;
 }
 
 export default function WallCalendar() {
   const now = new Date();
   const [yr, setYr] = useState(now.getFullYear());
   const [mo, setMo] = useState(now.getMonth());
-  const [start, setStart] = useState(null);
-  const [end, setEnd] = useState(null);
-  const [hover, setHover] = useState(null);
+  const [start, setStart] = useState<DateObj | null>(null);
+  const [end, setEnd] = useState<DateObj | null>(null);
+  const [hover, setHover] = useState<DateObj | null>(null);
   const [picking, setPicking] = useState(false);
   const [notes, setNotes] = useState(() => {
     try {
@@ -76,7 +83,7 @@ export default function WallCalendar() {
     }
   });
   const [noteText, setNoteText] = useState("");
-  const [activeKey, setActiveKey] = useState(null);
+  const [activeKey, setActiveKey] = useState<string | null>(null);
   const [anim, setAnim] = useState(false);
   const [animDir, setAnimDir] = useState(1);
   const [dark, setDark] = useState(false);
@@ -88,12 +95,8 @@ export default function WallCalendar() {
     } catch {}
   }, [notes]);
 
-  useEffect(() => {
-    setNoteText(activeKey ? notes[activeKey] || "" : "");
-  }, [activeKey]);
-
   const go = useCallback(
-    (dir) => {
+    (dir: number) => {
       if (anim) return;
       setAnimDir(dir);
       setAnim(true);
@@ -137,9 +140,10 @@ export default function WallCalendar() {
         setPicking(false);
         const k = `${s.y}-${s.m}-${s.d}__${e.y}-${e.m}-${e.d}`;
         setActiveKey(k);
+        setNoteText(notes[k] || "");
       }
     },
-    [picking, start, end, yr, mo],
+    [picking, start, end, yr, mo, notes],
   );
 
   const saveNote = () => {
@@ -337,9 +341,8 @@ export default function WallCalendar() {
           <img
             src={MONTH_IMAGES[mo]}
             alt={MONTHS[mo]}
+            fill
             style={{
-              width: "100%",
-              height: "100%",
               objectFit: "cover",
               display: "block",
               filter: C.hero,
@@ -852,7 +855,6 @@ export default function WallCalendar() {
           </div>
         </div>
       </div>
-
 
       <style>{`
         @media(max-width:600px){
